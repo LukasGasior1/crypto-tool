@@ -1,0 +1,10 @@
+.idea/
+target/
+dist/*
+project/boot/
+project/plugins/project/
+.ensime
+.ensime_cache/
+
+# intellij scala worksheet
+*.sc
