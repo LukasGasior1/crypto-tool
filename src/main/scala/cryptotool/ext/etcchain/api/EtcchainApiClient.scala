@@ -13,7 +13,8 @@ import org.json4s.native.JsonMethods
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-class EtcchainApiClient(implicit system: ActorSystem, materializer: Materializer, ec: ExecutionContext) {
+class EtcchainApiClient(config: EtcchainApiClientConfig)
+                       (implicit system: ActorSystem, materializer: Materializer, ec: ExecutionContext) {
 
   implicit val serialization = native.Serialization
   implicit val formats = DefaultFormats
@@ -50,6 +51,8 @@ class EtcchainApiClient(implicit system: ActorSystem, materializer: Materializer
     else Future.failed(new RuntimeException("Server did not return success status code"))
   }
 
-  private val baseUri = "https://etcchain.com/api/v1"
+  private val baseUri =
+    if (config.useHttps) "https://etcchain.com/api/v1"
+    else "http://etcchain.com/api/v1"
 
 }

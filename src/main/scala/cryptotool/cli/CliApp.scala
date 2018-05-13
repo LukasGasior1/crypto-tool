@@ -9,7 +9,7 @@ import cryptotool.ext.binance.service.BinanceService
 import cryptotool.ext.bittrex.api.{BittrexApiClient, BittrexApiClientConfig}
 import cryptotool.ext.bittrex.service.BittrexService
 import cryptotool.cli.service.{ProfitCalcCliService, SummaryCliService}
-import cryptotool.ext.etcchain.api.EtcchainApiClient
+import cryptotool.ext.etcchain.api.{EtcchainApiClient, EtcchainApiClientConfig}
 import cryptotool.ext.etcchain.service.EtcchainService
 import cryptotool.ext.etherscan.api.{EtherscanApiClient, EtherscanApiClientConfig}
 import cryptotool.ext.etherscan.service.EtherscanService
@@ -36,7 +36,7 @@ object CliApp extends App {
   val etherscanApiClient = new EtherscanApiClient(EtherscanApiClientConfig(config))
   val etherscanService = new EtherscanService(etherscanApiClient)
 
-  val etcchainApiClient = new EtcchainApiClient()
+  val etcchainApiClient = new EtcchainApiClient(EtcchainApiClientConfig(config))
   val etcchainService = new EtcchainService(etcchainApiClient)
 
   val summaryCliService = new SummaryCliService(bittrexService, binanceService, etherscanService, etcchainService)
