@@ -33,8 +33,19 @@ class SummaryCliService(
       if (exchanges.contains(Exchange.Binance)) binanceService.getSummary().map(Some.apply)
       else Future.successful(None)
 
-    val ethAccountsBalancesF = etherscanService.getBalances(ethAddresses)
-    val etcAccountsBalancesF = etcchainService.getBalances(etcAddresses)
+    val ethAccountsBalancesF = etherscanService.getBalances(ethAddresses).recover {
+      case ex =>
+        println("Unable to get balances of ETH accounts from etherscan.io")
+        println(ex.getMessage)
+        Map.empty[String, Double]
+    }
+
+    val etcAccountsBalancesF = etcchainService.getBalances(etcAddresses).recover {
+      case ex =>
+        println("Unable to get balances of ETC accounts from etcchain.com")
+        println(ex.getMessage)
+        Map.empty[String, Double]
+    }
 
     val marketSummariesF = bittrexService.getMarketSummaries()
 
