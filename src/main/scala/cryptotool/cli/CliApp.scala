@@ -8,7 +8,7 @@ import cryptotool.ext.binance.api.{BinanceApiClient, BinanceApiClientConfig}
 import cryptotool.ext.binance.service.BinanceService
 import cryptotool.ext.bittrex.api.{BittrexApiClient, BittrexApiClientConfig}
 import cryptotool.ext.bittrex.service.BittrexService
-import cryptotool.cli.service.{ProfitCalcCliService, SummaryCliService}
+import cryptotool.cli.service.{PricesCliService, ProfitCalcCliService, SummaryCliService}
 import cryptotool.ext.etcchain.api.{EtcchainApiClient, EtcchainApiClientConfig}
 import cryptotool.ext.etcchain.service.EtcchainService
 import cryptotool.ext.etherscan.api.{EtherscanApiClient, EtherscanApiClientConfig}
@@ -41,10 +41,12 @@ object CliApp extends App {
 
   val summaryCliService = new SummaryCliService(bittrexService, binanceService, etherscanService, etcchainService)
   val profitCalcCliService = new ProfitCalcCliService(binanceService)
+  val pricesCliService = new PricesCliService(bittrexService, binanceService)
 
   options.command match {
-    case balance: BalanceCmd => handleBalanceCommand(balance)
-    case profit: ProfitCmd => handleProfitCommand(profit)
+    case balanceCmd: BalanceCmd => handleBalanceCommand(balanceCmd)
+    case profitCmd: ProfitCmd => handleProfitCommand(profitCmd)
+    case pricesCmd: PricesCmd => handlePricesCommand(pricesCmd)
     case NoopCmd => println("Use either balance or profit command")
   }
 
@@ -65,6 +67,18 @@ object CliApp extends App {
     val resF = profitCalcCliService.profitCalc(
       exchange = profitCmd.exchange,
       currencies = profitCmd.currencies)
+
+    resF.foreach(_ => shutdown())
+    resF.failed.foreach { ex =>
+      println(ex)
+      shutdown()
+    }
+  }
+
+  private def handlePricesCommand(pricesCmd: PricesCmd): Unit = {
+    val resF = pricesCliService.prices(
+      exchange = pricesCmd.exchange,
+      tickers = pricesCmd.tickers)
 
     resF.foreach(_ => shutdown())
     resF.failed.foreach { ex =>

@@ -68,10 +68,40 @@ object OptionParser {
           opt[Seq[String]]("currencies").required()
             .action {
               case (currencies, Options(profitCmd: ProfitCmd)) => Options(profitCmd.copy(currencies = currencies))
-              case _ => throw new RuntimeException("Balance command expected")
+              case _ => throw new RuntimeException("Profit command expected")
             }
             .text(s"currencies to calculate profit for")
         )
+
+      cmd("prices").
+        action( (_, o) => o.copy(command = PricesCmd(Exchange.Binance, Nil)) )
+        .text("show tickers prices")
+        .children(
+          opt[String]("exchange").required()
+            .action {
+              case (exchange, Options(pricesCmd: PricesCmd)) =>
+                Options(pricesCmd.copy(exchange = exchange match {
+                  case "bittrex" => Exchange.Bittrex
+                  case "binance" => Exchange.Binance
+                  case other => throw new RuntimeException(s"Unsupported exchange: $other")
+                }))
+              case _ => throw new RuntimeException("Prices command expected")
+            }
+            .validate { rawExchange =>
+              val validExchanges = Seq("bittrex", "binance")
+              if (validExchanges.contains(rawExchange)) success
+              else failure(s"exchanges: $rawExchange not supported")
+            }
+            .text(s"supported exchanges: bittrex, binance"),
+
+          opt[Seq[String]]("tickers").required()
+            .action {
+              case (tickers, Options(pricesCmd: PricesCmd)) => Options(pricesCmd.copy(tickers = tickers))
+              case _ => throw new RuntimeException("Prices command expected")
+            }
+            .text(s"tickers to show")
+        )
+
       help("help")
         .text("prints this usage text")
     }

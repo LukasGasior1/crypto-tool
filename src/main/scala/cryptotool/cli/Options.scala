@@ -10,4 +10,6 @@ case class BalanceCmd(exchanges: Set[Exchange], ethAddresses: Option[Seq[String]
 
 case class ProfitCmd(exchange: Exchange, currencies: Seq[String]) extends Command
 
+case class PricesCmd(exchange: Exchange, tickers: Seq[String]) extends Command
+
 case class Options(command: Command = NoopCmd)
